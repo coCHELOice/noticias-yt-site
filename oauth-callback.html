@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>OAuth Callback — Noticias_YT</title>
+  <style>
+    :root { --bg:#0f172a; --fg:#e2e8f0; --muted:#94a3b8; --ok:#22c55e; --err:#ef4444; }
+    html,body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial; background:var(--bg); color:var(--fg); }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+    h1 { margin:0 0 6px 0; font-size: clamp(24px,4vw,38px); }
+    p.lead { color:var(--muted); margin-top:0; }
+    pre { background:#0b1220; padding:16px; border-radius:12px; overflow:auto; border:1px solid #1f2937; }
+    .status { display:inline-block; padding:4px 10px; border-radius:999px; font-weight:600; }
+    .ok { background: #052e1a; border:1px solid #14532d; color:#86efac; }
+    .err { background: #3b0a0a; border:1px solid #7f1d1d; color:#fca5a5; }
+    a { color:#a5b4fc; text-decoration:none; border-bottom:1px dashed #475569; }
+    footer { margin-top:20px; color:var(--muted); font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>OAuth Callback</h1>
+    <p class="lead">Página de retorno OAuth para pruebas y verificación. Última actualización: 2025-09-01.</p>
+    <p id="status" class="status">Procesando...</p>
+    <h2>Parámetros recibidos</h2>
+    <pre id="out">(esperando redirección...)</pre>
+    <p><a id="home" href="./">↩ Volver al inicio</a></p>
+    <footer>© 2025 Noticias_YT</footer>
+  </div>
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const obj = {}
+  for (const [k,v] of params.entries()) { obj[k] = v; }
+  const out = document.getElementById('out');
+  out.textContent = JSON.stringify(obj, null, 2);
+
+  const statusEl = document.getElementById('status');
+  if (params.get('error')) {
+    statusEl.textContent = 'Error en autenticación: ' + params.get('error');
+    statusEl.className = 'status err';
+  } else if (params.get('code')) {
+    statusEl.textContent = 'Login OK — se recibió código de autorización.';
+    statusEl.className = 'status ok';
+  } else {
+    statusEl.textContent = 'Redirección recibida sin parámetros.';
+    statusEl.className = 'status';
+  }
+
+  try {
+    if (window.opener && window.opener !== window) {
+      window.opener.postMessage({
+        source: 'noticias_yt_callback',
+        params: obj,
+        path: window.location.pathname
+      }, '*');
+    }
+  } catch(e){}
+})();
+</script>
+</body>
+</html>
